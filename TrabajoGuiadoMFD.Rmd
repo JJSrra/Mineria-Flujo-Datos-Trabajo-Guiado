@@ -71,3 +71,37 @@ t.test(poblacionNaiveBayes, poblacionHoeffding)
 ```
 
 En base a los resultados obtenidos podemos afirmar que la diferencia en media de los resultados de los dos algoritmos no es igual a 0, es decir, existen diferencias significativas. En este caso, el algoritmo Hoeffding funciona mejor que el algoritmo Naïve Bayes, pues a igualdad de distribución tiene una media mayor.
+
+## Ejercicio 2
+
+### Se pide generar 100.000 instancias utilizando el generador de datos SEAGenerator, con un desvío de concepto centrado en la instancia 20.000 en una ventana de 100 instancias. Para simular el desvío de concepto, hacer que el simulador genere la función –f 2 al principio, y luego la función –f 3. Usar un clasificador Naïve Bayes evaluado con una frecuencia de muestreo de 1.000 instancias, usando el método prequential para evaluación. Inserte la configuración directamente en la GUI de MOA para visualizar la gráfica de la evolución de la tasa de aciertos (medida accuracy). ¿Qué se observa?
+
+La tarea es evaluar en prequential, sobre el modelo Naïve Bayes, generando 100.000 instancias con frecuencia de muestreo de 1.000.
+
+```
+EvaluatePrequential -l bayes.NaiveBayes -s (ConceptDriftStream -s \
+(generators.SEAGenerator -f 2) -d (generators.SEAGenerator -f 3) -p \
+20000 -w 100) -i 100000 -f 1000
+```
+
+Mostramos el valor del accuracy en el tiempo para este clasificador.
+
+```{r}
+conceptDrift1 = read.csv("Datos/Ejercicio2/conceptDrift1.csv")
+
+# Mostrar el acierto del clasificador en el tiempo
+plot(conceptDrift1$learning.evaluation.instances,
+     conceptDrift1$classifications.correct..percent.,
+     "l", ylim = c(0,100), col = "red")
+
+# Mostrar el último valor de accuracy y kappa junto a los valores medios
+conceptDrift1$classifications.correct..percent.[
+  length(conceptDrift1$classifications.correct..percent.)]
+mean(conceptDrift1$classifications.correct..percent.)
+
+conceptDrift1$Kappa.Statistic..percent.[
+  length(conceptDrift1$Kappa.Statistic..percent.)]
+mean(conceptDrift1$Kappa.Statistic..percent.)
+```
+
+Se observa que el modelo aprende después del cambio de concepto y se recupera hasta volver a llegar a un nivel aceptable de acierto.
