@@ -105,3 +105,22 @@ mean(conceptDrift1$Kappa.Statistic..percent.)
 ```
 
 Se observa que el modelo aprende después del cambio de concepto y se recupera hasta volver a llegar a un nivel aceptable de acierto.
+
+## Ejercicio 3
+
+### Entrenar un modelo estático Naïve Bayes sobre 100.000 instancias de la función 2 del generador SEAGenerator. Seguidamente, evaluarlo con un flujo de datos con desvío de concepto generado por el generador de datos SEAGenerator, con un desvío de concepto centrado en la instancia 20.000 en una ventana de 100 instancias. Para simular el desvío de concepto, hacer que el simulador genere la función –f 2 al principio, y luego la función –f 3.
+
+Para alcanzar el objetivo pedido hay que ejecutar el siguiente comando:
+
+```
+EvaluateModel -m (LearnModel -l bayes.NaiveBayes -s (generators.SEAGenerator -f 2) \
+-m 100000) -s (ConceptDriftStream -s (generators.SEAGenerator -f 2) -d \
+(generators.SEAGenerator -f 3) -p 20000 -w 100) -i 100000
+```
+
+Si comprobamos las soluciones obtenidas (almacenadas en `Datos/Ejercicio3/conceptDrift2.csv`) vemos lo siguiente.
+
+\includegraphics{Datos/Ejercicio3/ejercicio3}
+
+En este caso el modelo al ser estacionario aprende previamente sobre unos datos y no sigue aprendiendo en el tiempo, como sí hace el dinámico. Por tanto a partir del cambio de concepto al accuracy del modelo estacionario desciende y nunca la recupera.
+
