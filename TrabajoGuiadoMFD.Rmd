@@ -124,3 +124,29 @@ Si comprobamos las soluciones obtenidas (almacenadas en `Datos/Ejercicio3/concep
 
 En este caso el modelo al ser estacionario aprende previamente sobre unos datos y no sigue aprendiendo en el tiempo, como sí hace el dinámico. Por tanto a partir del cambio de concepto al accuracy del modelo estacionario desciende y nunca la recupera.
 
+## Ejercicio 4
+
+### ¿Qué ocurriría si pudiésemos detectar un cambio de concepto y re-entrenar un modelo estacionario?. El resultado no sería un modelo “estacionario”, sino múltiples de ellos entrenados tras detectar cambio de concepto. Se pide: Evaluar, y entrenar online con el método TestThenTrain, un modelo estacionario Naïve Bayes que se adapta (re-entrena) tras la detección de un cambio de concepto mediante el método DDM (función SingleClassifierDrift). Usar el flujo de datos del ejercicio anterior.
+
+El comando a utilizar para obtener el resultado que pide el enunciado es el siguiente:
+
+```
+EvaluateInterleavedTestThenTrain -l (moa.classifiers.drift.SingleClassifierDrift -l \
+bayes.NaiveBayes -d DDM) -s (ConceptDriftStream -s (generators.SEAGenerator -f 2) -d \
+(generators.SEAGenerator -f 3) -p 20000 -w 100) -i 100000
+```
+
+Esto se ejecuta y se guarda en un fichero csv para su posterior lectura y análisis con R.
+
+```{r}
+conceptDrift3 = read.csv("Datos/Ejercicio4/conceptDrift3.csv")
+
+# Mostrar el último valor de accuracy y kappa junto a los valores medios
+conceptDrift3$classifications.correct..percent.[length(conceptDrift3$classifications.correct..percent.)]
+mean(conceptDrift3$classifications.correct..percent.)
+
+conceptDrift3$Kappa.Statistic..percent.[length(conceptDrift3$Kappa.Statistic..percent.)]
+mean(conceptDrift3$Kappa.Statistic..percent.)
+```
+
+Como se puede observar, en este caso el modelo sí que está aprendiendo tras el cambio de concepto, y de hecho aprende constantemente. Los resultados son sustancialmente mejores tanto en accuracy como en el estadístico Kappa. Tras un cambio de concepto, un modelo estacionario deja de funcionar, pero un modelo dinámico puede seguir funcionando correctamente.
