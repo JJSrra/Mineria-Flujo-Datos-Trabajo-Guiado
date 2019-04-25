@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Ejercicio 1
 
-Se pide comparar la eficacia de un Hoeffding Tree con un clasificador Naïve Bayes, para un flujo de datos de 1.000.000 de instancias generadas con un generador RandomTreeGenerator, suponiendo una frecuencia de muestreo de 10.000 y con el método de evaluación Interleaved Test-Then-Train.
+### Se pide comparar la eficacia de un Hoeffding Tree con un clasificador Naïve Bayes, para un flujo de datos de 1.000.000 de instancias generadas con un generador RandomTreeGenerator, suponiendo una frecuencia de muestreo de 10.000 y con el método de evaluación Interleaved Test-Then-Train.
 
 Aquí vemos como se ejecuta un modelo con Naïve Bayes.
 
@@ -34,9 +34,11 @@ Una vez obtenidos los datos, cada archivo convenientenemente renombrado acorde a
 ```{r}
 poblacionNaiveBayes = array(dim = 30)
 for (i in 1:30) {
-  archivo = paste(c(paste(c("./Datos/Ejercicio1/naiveBayes",i),collapse = ""),".csv"),collapse="")
+  archivo =
+    paste(c(paste(c("./Datos/Ejercicio1/naiveBayes",i),collapse = ""),".csv"),collapse="")
   datos = read.csv(archivo)
-  accuracyFinal = datos$classifications.correct..percent.[length(datos$classifications.correct..percent.)]
+  accuracyFinal =
+    datos$classifications.correct..percent.[length(datos$classifications.correct..percent.)]
   poblacionNaiveBayes[i] = accuracyFinal
 }
 ```
@@ -46,11 +48,26 @@ Y a continuación leemos los de Hoeffding.
 ```{r}
 poblacionHoeffding = array(dim = 30)
 for (i in 1:30) {
-  archivo = paste(c(paste(c("./Datos/Ejercicio1/hoeffding",i),collapse = ""),".csv"),collapse="")
+  archivo =
+    paste(c(paste(c("./Datos/Ejercicio1/hoeffding",i),collapse = ""),".csv"),collapse="")
   datos = read.csv(archivo)
-  accuracyFinal = datos$classifications.correct..percent.[length(datos$classifications.correct..percent.)]
+  accuracyFinal =
+    datos$classifications.correct..percent.[length(datos$classifications.correct..percent.)]
   poblacionHoeffding[i] = accuracyFinal
 }
 ```
 
+Para saber si hacer un test paramétrico o no paramétrico para comparar los resultados de ambos algoritmos, primero evaluamos con el test de Shapiro-Wilk si siguen una distribución normal ambas poblaciones.
 
+```{r}
+shapiro.test(poblacionNaiveBayes)
+shapiro.test(poblacionHoeffding)
+```
+
+Como según los resultados las dos poblaciones siguen una distribución normal podemos realizar un test paramétrico como el test T de Student.
+
+```{r}
+t.test(poblacionNaiveBayes, poblacionHoeffding)
+```
+
+En base a los resultados obtenidos podemos afirmar que la diferencia en media de los resultados de los dos algoritmos no es igual a 0, es decir, existen diferencias significativas. En este caso, el algoritmo Hoeffding funciona mejor que el algoritmo Naïve Bayes, pues a igualdad de distribución tiene una media mayor.
